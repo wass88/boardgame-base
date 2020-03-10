@@ -16,11 +16,12 @@ func hello(c echo.Context) error {
 func server(api *transactionAPI) {
 	e := echo.New()
 	initEcho(e)
-	e.GET("/", hello)
 	e.GET("/api/coins", api.getCoins)
 	e.GET("/api/transactions", api.getTransactions)
 	e.POST("/api/transactions", api.newTransaction)
 	e.POST("/api/user", api.newUser)
+	e.File("/", "static/index.html")
+	e.Static("/", "static")
 	data, _ := json.MarshalIndent(e.Routes(), "", "  ")
 	fmt.Printf("%s", data)
 	fmt.Printf("Ready")

@@ -100,7 +100,8 @@ func (db *coinDB) addUser(user string) error {
 	if _, ok := db.Coins.Coins[user]; ok {
 		return fmt.Errorf("Already exists User: %s", user)
 	}
-	db.Coins.Coins[user] = 0
+	initCoin := 1000
+	db.Coins.Coins[user] = initCoin
 	return nil
 }
 
