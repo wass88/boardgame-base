@@ -8,23 +8,23 @@ import (
 )
 
 type transaction struct {
-	Game      string               `json:"Game"`
-	Pay       map[string]*payMount `json:"Pay"`
+	Game      string               `json:"game"`
+	Pay       map[string]*payMount `json:"pay"`
 	CreatedAt time.Time            `json:"created_at"`
 }
 
 type payMount struct {
-	Mount  int    `json:"Mount" validate:"required`
-	Result string `json:"string" validate:"required`
+	Mount  int    `json:"mount" validate:"required`
+	Result string `json:"result" validate:"required`
 }
 
 type coins struct {
-	Coins map[string]int `json:"Coins"`
+	Coins map[string]int `json:"coins"`
 }
 
 type coinDB struct {
 	Transactions []*transaction `json:"transactions"`
-	Coins        *coins         `json:"Coins"`
+	Coins        *coins         `json:"coins"`
 }
 
 func newDB() coinDB {

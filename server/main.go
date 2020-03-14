@@ -18,7 +18,7 @@ func server(api *transactionAPI) {
 	initEcho(e)
 	e.GET("/api/coins", api.getCoins)
 	e.GET("/api/transactions", api.getTransactions)
-	e.POST("/api/transactions", api.newTransaction)
+	e.POST("/api/transaction", api.newTransaction)
 	e.POST("/api/user", api.newUser)
 	e.File("/", "static/index.html")
 	e.Static("/", "static")

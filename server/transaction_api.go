@@ -30,7 +30,9 @@ func (api *transactionAPI) newTransaction(c echo.Context) error {
 	if err := c.Bind(req); err != nil {
 		return err
 	}
-	api.DB.addTransaction(req.Game, req.Pay)
+	if err := api.DB.addTransaction(req.Game, req.Pay); err != nil {
+		return err
+	}
 	api.save()
 	return nil
 }
