@@ -52,7 +52,8 @@ view model =
         , h2 [] [ text "コイン所持数ランキング" ]
         , coinTable model.coins
         , h2 [] [ text "取得履歴" ]
-        , newTransaction model model.newTransactionForm
         , transactionsTable model.transactions
+        , h2 [] [ text "取得" ]
+        , newTransaction model model.newTransactionForm
         ]
     }

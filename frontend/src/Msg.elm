@@ -14,6 +14,7 @@ type Msg
 type ApiMsg
     = GotCoins (Result Http.Error Coins)
     | GotTransactions (Result Http.Error Transactions)
+    | CompletePostTransaction (Result Http.Error ())
 
 
 type NewTransactionFormMsg
@@ -21,3 +22,7 @@ type NewTransactionFormMsg
     | NewSelect (Select.Msg User)
     | ChangeUser Int (Maybe User)
     | Select Int (Select.Msg User)
+    | InputPay Int String
+    | InputResult Int String
+    | Submit
+    | ChangeGame String

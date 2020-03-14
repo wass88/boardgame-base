@@ -1,5 +1,6 @@
 module NewTransactionForm exposing (initNewTransactionForm, newTransaction, update)
 
+import Api
 import Array
 import Dict
 import Html exposing (..)
@@ -26,6 +27,7 @@ userFormConfig m =
         , filter = filter .label
         }
         |> Select.withEmptySearch True
+        |> Select.withClear False
 
 
 newUserFormConfig : Select.Config Msg User
@@ -38,11 +40,22 @@ subUserFormConfig id =
     userFormConfig (\u -> NewTransactionFormMsg (ChangeUser id u))
 
 
-userOptions : Model -> List User
-userOptions m =
-    Dict.toList
-        m.coins
-        |> List.map (\( u, _ ) -> { id = u, label = u })
+candidates : Model -> List User
+candidates model =
+    let
+        subform =
+            model.newTransactionForm.mountForm
+    in
+    let
+        selected =
+            List.map .user (Array.toList subform)
+    in
+    let
+        users =
+            Dict.keys model.coins
+    in
+    List.filter (\u -> not (List.member u selected)) users
+        |> List.map (\u -> { id = u, label = u })
 
 
 incrementalForm : Model -> NewTransactionForm -> Html Msg
@@ -55,11 +68,11 @@ incrementalForm model tf =
                         [ Select.view
                             (subUserFormConfig id)
                             f.select
-                            (userOptions model)
+                            ({ label = f.user, id = f.user } :: candidates model)
                             [ { label = f.user, id = f.user } ]
                             |> Html.map (\m -> NewTransactionFormMsg (Select id m))
-                        , input [ value (String.fromInt f.pay), type_ "number" ] []
-                        , input [ value f.result ] []
+                        , input [ onInput (\m -> NewTransactionFormMsg (InputPay id m)), value (String.fromInt f.pay), type_ "number" ] []
+                        , input [ onInput (\m -> NewTransactionFormMsg (InputResult id m)), value f.result ] []
                         ]
                 )
                 tf.mountForm
@@ -70,8 +83,8 @@ incrementalForm model tf =
                 [ Select.view
                     newUserFormConfig
                     model.newTransactionForm.newForm
-                    (userOptions model)
-                    []
+                    (candidates model)
+                    [ { label = "追加", id = "" } ]
                     |> Html.map (\m -> NewTransactionFormMsg (NewSelect m))
                 , input [ disabled True ] []
                 , input [ disabled True ] []
@@ -80,17 +93,40 @@ incrementalForm model tf =
     div [] (Array.toList forms ++ [ new ])
 
 
+readyTransaction : NewTransactionForm -> Bool
+readyTransaction tf =
+    Array.length tf.mountForm
+        > 1
+        && sumTransaction tf
+        == 0
+        && tf.game
+        /= ""
+
+
 initNewTransactionForm : NewTransactionForm
 initNewTransactionForm =
-    { mountForm = Array.empty
+    { game = ""
+    , mountForm = Array.empty
     , newForm = Select.newState "Orignal"
     }
+
+
+sumTransaction : NewTransactionForm -> Int
+sumTransaction tf =
+    Array.foldl (\f i -> f.pay + i) 0 tf.mountForm
 
 
 newTransaction : Model -> NewTransactionForm -> Html Msg
 newTransaction model tf =
     div []
-        [ text "入力フォーム"
+        [ text ("合計: " ++ String.fromInt (sumTransaction model.newTransactionForm))
+        , button
+            [ disabled (not (readyTransaction model.newTransactionForm))
+            , onClick (NewTransactionFormMsg Submit)
+            ]
+            [ text "送信" ]
+        , text "ゲーム"
+        , input [ value tf.game, onInput (\m -> NewTransactionFormMsg (ChangeGame m)) ] []
         , incrementalForm model tf
         ]
 
@@ -121,71 +157,118 @@ addUser u m =
             m
 
 
-changeUser : Int -> Maybe User -> Model -> Model
-changeUser id u model =
-    case u of
-        Nothing ->
-            model
+updateTF_ : Model -> (NewTransactionForm -> NewTransactionForm) -> ( Model, Cmd Msg )
+updateTF_ m f =
+    ( { m | newTransactionForm = f m.newTransactionForm }, Cmd.none )
 
-        Just user ->
-            let
-                form =
-                    model.newTransactionForm
-            in
+
+updateTF : Model -> (NewTransactionForm -> ( NewTransactionForm, Cmd Msg )) -> ( Model, Cmd Msg )
+updateTF m f =
+    let
+        ( fm, cmd ) =
+            f m.newTransactionForm
+    in
+    ( { m | newTransactionForm = fm }, cmd )
+
+
+updateMountFormID_ : Model -> Int -> (MountForm -> MountForm) -> ( Model, Cmd Msg )
+updateMountFormID_ model id f =
+    updateTF_ model
+        (\form ->
             case Array.get id form.mountForm of
                 Nothing ->
-                    model
+                    Debug.log "Unknown Select" form
 
                 Just subform ->
-                    let
-                        updated =
-                            { subform | user = user.id }
-                    in
-                    { model | newTransactionForm = { form | mountForm = Array.set id updated form.mountForm } }
+                    { form | mountForm = Array.set id (f subform) form.mountForm }
+        )
+
+
+parseNumber : String -> Int
+parseNumber num =
+    let
+        purify h ( s, f ) =
+            if f && h == '-' then
+                ( "-", False )
+
+            else
+                case String.toInt (String.fromChar h) of
+                    Nothing ->
+                        ( "", False )
+
+                    Just _ ->
+                        ( s ++ String.fromChar h, False )
+    in
+    let
+        ( pure, _ ) =
+            String.foldl purify ( "", True ) num
+    in
+    case String.toInt pure of
+        Nothing ->
+            0
+
+        Just n ->
+            n
 
 
 update : NewTransactionFormMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Msg.ChangeNewUser t ->
-            ( addUser t model, Cmd.none )
+        ChangeNewUser t ->
+            Debug.log "New"
+                ( addUser t model, Cmd.none )
 
-        Msg.NewSelect m ->
-            let
-                form =
-                    model.newTransactionForm
-            in
-            let
-                ( updated, cmd ) =
-                    Select.update newUserFormConfig m form.newForm
-            in
-            ( { model | newTransactionForm = { form | newForm = updated } }, cmd )
-
-        Msg.ChangeUser id t ->
-            ( changeUser id t model, Cmd.none )
-
-        Msg.Select id m ->
-            let
-                form =
-                    model.newTransactionForm
-            in
-            case Array.get id form.mountForm of
-                Nothing ->
-                    Debug.log "Unknown Select"
-                        ( model, Cmd.none )
-
-                Just subform ->
+        NewSelect m ->
+            updateTF model
+                (\form ->
                     let
                         ( updated, cmd ) =
+                            Select.update newUserFormConfig m form.newForm
+                    in
+                    ( { form | newForm = updated }, cmd )
+                )
+
+        ChangeUser id t ->
+            case t of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just user ->
+                    updateMountFormID_ model
+                        id
+                        (\subform ->
+                            { subform | user = user.id }
+                        )
+
+        Select id m ->
+            updateMountFormID_ model
+                id
+                (\subform ->
+                    let
+                        ( updated, _ ) =
                             Select.update (subUserFormConfig id) m subform.select
                     in
-                    let
-                        subformUpdated =
-                            { subform | select = updated }
-                    in
-                    ( { model
-                        | newTransactionForm =
-                            { form | mountForm = Array.set id subformUpdated form.mountForm }
-                      }
-                    , cmd
-                    )
+                    { subform | select = updated }
+                )
+
+        InputPay id number ->
+            updateMountFormID_ model
+                id
+                (\form ->
+                    { form | pay = parseNumber number }
+                )
+
+        InputResult id result ->
+            ( model, Cmd.none )
+
+        Submit ->
+            updateTF model
+                (\_ ->
+                    ( initNewTransactionForm, Cmd.map ApiMsg (Api.submitTransaction model) )
+                )
+
+        ChangeGame game ->
+            updateTF_ model
+                (\form ->
+                    { form | game = game }
+                )

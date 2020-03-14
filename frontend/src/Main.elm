@@ -35,6 +35,7 @@ initCmd : Cmd Msg
 initCmd =
     Cmd.batch
         [ Cmd.map ApiMsg Api.fetchCoins
+        , Cmd.map ApiMsg Api.fetchTransactions
         ]
 
 

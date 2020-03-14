@@ -39,6 +39,7 @@ type alias MountForm =
 type alias NewTransactionForm =
     { mountForm : Array.Array MountForm
     , newForm : Select.State
+    , game : String
     }
 
 
