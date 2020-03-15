@@ -3,6 +3,7 @@ module Api exposing (..)
 import Array
 import Dict
 import Http
+import Iso8601
 import Json.Decode as D
 import Json.Encode as E
 import Model exposing (..)
@@ -29,13 +30,16 @@ update : ApiMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotCoins (Ok coins) ->
-            ( { model | coins = coins }, Cmd.none )
+            Debug.log "GotCoins"
+                ( { model | coins = coins }, Cmd.none )
 
         GotTransactions (Ok transactions) ->
-            ( { model | transactions = transactions }, Cmd.none )
+            Debug.log "GotTransactions"
+                ( { model | transactions = transactions }, Cmd.none )
 
         CompletePostTransaction (Ok ()) ->
-            ( model, Cmd.none )
+            Debug.log "PostTransactions"
+                ( model, Cmd.batch [ Cmd.map Msg.ApiMsg fetchTransactions, Cmd.map Msg.ApiMsg fetchCoins ] )
 
         GotCoins (Err err) ->
             Debug.log (Debug.toString err)
@@ -75,7 +79,7 @@ transactionDecoder =
     D.map3 (\x y z -> { game = x, pay = y, createdAt = z })
         (D.field "game" D.string)
         (D.field "pay" (D.dict payMountDecoder))
-        (D.field "created_at" D.string)
+        (D.field "created_at" Iso8601.decoder)
 
 
 transactionsDecoder : D.Decoder Transactions

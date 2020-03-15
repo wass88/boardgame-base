@@ -1,6 +1,57 @@
+/* Typography */
+body {
+    padding: 0;
+    margin: 0;
+    line-height: 1em;
+    font-size: 1em;
+}
+h1, h2, h3, h4 {
+    font-size: 1em;
+    margin: 1em;
+}
+
+/* Coin Table */
+.coin-table {
+    margin: -1em 1em;
+    padding: 0;
+    border-spacing: 1em;
+}
+td {
+    border: 0px;
+    padding: 0px;
+}
+
+/* Pay Table */
+.pay-line {
+    margin: 1em;
+}
+.pay-desc {
+}
+.pay-table {
+    display: flex;
+    margin: 1em;
+}
+.pay-user {
+    margin: 0 0.5em;
+}
+
+.pay-mount {
+    margin: 0 0.5em;
+}
+.pay-result {
+    margin: 0 0.5em;
+}
+
+/* New Form */
+.new-pay {
+    margin: 1em;
+}
+.new-info {
+    margin: 0 0.5em;
+}
 .elm-select-input {
     border: 1px solid black;
 }
 .elm-select-item {
-    border: 1px solid black;
+    border: 2px solid black;
 }

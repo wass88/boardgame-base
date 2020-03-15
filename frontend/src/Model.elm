@@ -3,6 +3,7 @@ module Model exposing (..)
 import Array
 import Dict
 import Select
+import Time
 
 
 type alias Coins =
@@ -16,7 +17,7 @@ type alias PayMount =
 type alias Transaction =
     { pay : Dict.Dict String PayMount
     , game : String
-    , createdAt : String
+    , createdAt : Time.Posix
     }
 
 

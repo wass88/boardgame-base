@@ -64,30 +64,41 @@ incrementalForm model tf =
         forms =
             Array.indexedMap
                 (\id f ->
-                    div []
+                    div [ class "new-line" ]
                         [ Select.view
                             (subUserFormConfig id)
                             f.select
                             ({ label = f.user, id = f.user } :: candidates model)
                             [ { label = f.user, id = f.user } ]
                             |> Html.map (\m -> NewTransactionFormMsg (Select id m))
-                        , input [ onInput (\m -> NewTransactionFormMsg (InputPay id m)), value (String.fromInt f.pay), type_ "number" ] []
-                        , input [ onInput (\m -> NewTransactionFormMsg (InputResult id m)), value f.result ] []
+                        , input
+                            [ class "new-mounton"
+                            , onInput (\m -> NewTransactionFormMsg (InputPay id m))
+                            , value (String.fromInt f.pay)
+                            , type_ "number"
+                            ]
+                            []
+                        , input
+                            [ class "new-result"
+                            , onInput (\m -> NewTransactionFormMsg (InputResult id m))
+                            , value f.result
+                            ]
+                            []
                         ]
                 )
                 tf.mountForm
     in
     let
         new =
-            div []
+            div [ class "new-line new-line-new" ]
                 [ Select.view
                     newUserFormConfig
                     model.newTransactionForm.newForm
                     (candidates model)
                     [ { label = "追加", id = "" } ]
                     |> Html.map (\m -> NewTransactionFormMsg (NewSelect m))
-                , input [ disabled True ] []
-                , input [ disabled True ] []
+                , input [ class "new-mount", disabled True ] []
+                , input [ class "new-result", disabled True ] []
                 ]
     in
     div [] (Array.toList forms ++ [ new ])
@@ -118,13 +129,14 @@ sumTransaction tf =
 
 newTransaction : Model -> NewTransactionForm -> Html Msg
 newTransaction model tf =
-    div []
-        [ text ("合計: " ++ String.fromInt (sumTransaction model.newTransactionForm))
-        , button
-            [ disabled (not (readyTransaction model.newTransactionForm))
+    div [ class "new-pay" ]
+        [ button
+            [ class "new-pay-submit"
+            , disabled (not (readyTransaction model.newTransactionForm))
             , onClick (NewTransactionFormMsg Submit)
             ]
             [ text "送信" ]
+        , span [ class "new-info" ] [ text ("合計: " ++ String.fromInt (sumTransaction model.newTransactionForm)) ]
         , text "ゲーム"
         , input [ value tf.game, onInput (\m -> NewTransactionFormMsg (ChangeGame m)) ] []
         , incrementalForm model tf
@@ -215,8 +227,7 @@ update : NewTransactionFormMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeNewUser t ->
-            Debug.log "New"
-                ( addUser t model, Cmd.none )
+            ( addUser t model, Cmd.none )
 
         NewSelect m ->
             updateTF model
