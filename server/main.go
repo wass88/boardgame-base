@@ -25,7 +25,7 @@ func server(api *transactionAPI) {
 	data, _ := json.MarshalIndent(e.Routes(), "", "  ")
 	fmt.Printf("%s", data)
 	fmt.Printf("Ready")
-	e.Logger.Fatal(e.Start(":18080"))
+	e.Logger.Fatal(e.Start(":13241"))
 }
 func main() {
 	flag.Parse()

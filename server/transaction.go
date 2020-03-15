@@ -14,17 +14,17 @@ type transaction struct {
 }
 
 type payMount struct {
-	Mount  int    `json:"mount" validate:"required`
-	Result string `json:"result" validate:"required`
+	Mount  int    `json:"mount" validate:"required"`
+	Result string `json:"result" validate:"required"`
 }
 
 type coins struct {
-	Coins map[string]int `json:"coins"`
+	Coins map[string]int `json:"coins" validate:"required"`
 }
 
 type coinDB struct {
-	Transactions []*transaction `json:"transactions"`
-	Coins        *coins         `json:"coins"`
+	Transactions []*transaction `json:"transactions" validate:"required"`
+	Coins        *coins         `json:"coins" validate:"required"`
 }
 
 func newDB() coinDB {

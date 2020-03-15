@@ -29,10 +29,10 @@ payMountView dict =
         |> List.sortBy (\( _, pay ) -> pay.mount)
         |> List.map
             (\( user, pay ) ->
-                div [ class "pay-table" ]
-                    [ p [ class "pay-user" ] [ text user ]
-                    , p [ class "pay-mount" ] [ text (String.fromInt pay.mount) ]
-                    , p [ class "pay-result" ] [ text pay.result ]
+                tr [ class "pay-table" ]
+                    [ td [ class "pay-user" ] [ text user ]
+                    , td [ class "pay-mount" ] [ text (String.fromInt pay.mount) ]
+                    , td [ class "pay-result" ] [ text pay.result ]
                     ]
             )
 
@@ -41,7 +41,7 @@ transactionLine : Transaction -> Html Msg
 transactionLine t =
     div [ class "pay-line" ]
         [ p [ class "game" ] [ text (t.game ++ " " ++ Strftime.format "%y-%m-%d %H:%M" Time.utc t.createdAt) ]
-        , div [ class "pay-desc" ] (payMountView t.pay)
+        , table [ class "pay-desc" ] (payMountView t.pay)
         ]
 
 

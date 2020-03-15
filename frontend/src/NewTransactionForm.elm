@@ -270,7 +270,11 @@ update msg model =
                 )
 
         InputResult id result ->
-            ( model, Cmd.none )
+            updateMountFormID_ model
+                id
+                (\subform ->
+                    { subform | result = result }
+                )
 
         Submit ->
             updateTF model

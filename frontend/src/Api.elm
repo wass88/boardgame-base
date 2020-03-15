@@ -12,13 +12,13 @@ import Msg exposing (ApiMsg(..), Msg)
 
 sendRequest : String -> String -> Http.Body -> Http.Expect msg -> Cmd msg
 sendRequest method path body except =
-    Http.request
+    Http.riskyRequest
         { method = method
         , headers =
             [ Http.header "Accept" "application/json"
             , Http.header "Content-Type" "application/json"
             ]
-        , url = "http://localhost:18080/" ++ path
+        , url = "./" ++ path
         , expect = except
         , body = body
         , timeout = Nothing

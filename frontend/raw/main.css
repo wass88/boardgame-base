@@ -4,6 +4,8 @@ body {
     margin: 0;
     line-height: 1em;
     font-size: 1em;
+    background: hsl(289, 100%, 2%);
+    color: hsl(289, 4%, 80%);
 }
 h1, h2, h3, h4 {
     font-size: 1em;
@@ -11,12 +13,12 @@ h1, h2, h3, h4 {
 }
 
 /* Coin Table */
-.coin-table {
+table {
     margin: -1em 1em;
     padding: 0;
     border-spacing: 1em;
 }
-td {
+tr, td {
     border: 0px;
     padding: 0px;
 }
@@ -28,18 +30,13 @@ td {
 .pay-desc {
 }
 .pay-table {
-    display: flex;
-    margin: 1em;
 }
 .pay-user {
-    margin: 0 0.5em;
 }
 
 .pay-mount {
-    margin: 0 0.5em;
 }
 .pay-result {
-    margin: 0 0.5em;
 }
 
 /* New Form */
@@ -49,9 +46,45 @@ td {
 .new-info {
     margin: 0 0.5em;
 }
+input {
+    background: hsl(0, 0%, 94%);
+    border-radius: 0.3em;
+    font: inherit;
+    width: 10em;
+    height: 2em;
+    border-width: 2px !important;
+    border-style: inset !important;
+    border-color: initial !important;
+    border-image: initial !important;
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+button {
+    background: hsl(0, 0%, 94%);
+    border-radius: 0.3em;
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0.5em;
+    color: black;
+    font: inherit;
+}
+.new-line {
+    display: flex;
+    margin: 0.5em 0;
+}
+.elm-select-input-control  {
+    width: 10em;
+    background: transparent !important;
+}
 .elm-select-input {
-    border: 1px solid black;
+    line-height: 2em;
+    font-size: inherit !important;
 }
 .elm-select-item {
     border: 2px solid black;
+    background: white;
+    color: black;
+    width: 10em;
+    line-height: 2em;
 }
